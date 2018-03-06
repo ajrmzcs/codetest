@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\CustomGoogleCalendar;
 use App\Http\Controllers\Controller;
 use Google_Client;
 use Google_Service_Calendar;
@@ -37,16 +38,31 @@ class GoogleLoginController extends Controller
             'expires_in' => $user->expiresIn
         ];
 
-        $client = new Google_Client();
-        $client->setApplicationName("Laravel test");
-        $client->setDeveloperKey(env('GOOGLE_CLIENT_ID'));
-        $client->setAccessToken(json_encode($google_client_token));
+        $calendarEvents = (new CustomGoogleCalendar())->getCalendarEvents($google_client_token, $user->email);
 
-        $service = new Google_Service_Calendar($client);
+        dd($calendarEvents);
 
-        dd($service->events->listEvents('ajrmzcs@gmail.com',[])->getItems());
+        $dateArray = getdate();
 
+        $year = $dateArray['year'];
 
-        dd($user);
+        $months = config('calendar.months');
+
+        $calendarData = [];
+
+        foreach ($months as $key => $month) {
+
+            // Date for first day of month
+            $monthFirstDay = mktime(0,0,0,$key,1,$year);
+
+            // Days of the month
+            $daysOfMonth = date('t',$monthFirstDay);
+
+            $calendarData[$month] = $daysOfMonth;
+
+        }
+
+        dd($calendarData);
+
     }
 }
