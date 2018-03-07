@@ -8,9 +8,10 @@ This is a basic Google Authentication with Laravel Socialite to show a current y
 
 ### Installation steps:
 * Clone this repository
-* Activate Google+ and Google Calendar and obtain credentials from google developer console
+* Activate Google+ and Google Calendar Apis and obtain credentials from google developer console
 * Copy .env from .env-example
 * Set google credentials in .env file
+* Add Google Console Applicaction name to config/calendar.php array under google-application-name
 * run in terminal:
     ```bash
     composer install
