@@ -14,7 +14,7 @@ class CustomGoogleCalendar
     /**
      * @param $googleToken
      * @param $calendarId
-     * @return \Google_Service_Calendar_Events
+     * @return array
      */
     public function getCalendarEvents($googleToken, $calendarId)
     {
@@ -36,13 +36,54 @@ class CustomGoogleCalendar
             'timeMax' => date('c', mktime(23, 59, 59, 12, 31, $year))
         ];
 
-        dd($service->events->listEvents($calendarId,$opt_params)->getItems());
+        $events = $service->events->listEvents($calendarId,$opt_params)->getItems();
 
+        $dateArray = getdate();
+        $year = $dateArray['year'];
+        $months = config('calendar.months');
+        $daysPerMonth = [];
+
+        // Prepare yearly data
+        foreach ($months as $key => $month) {
+
+            // Date for first day of month
+            $monthFirstDay = mktime(0,0,0,$key,1,$year);
+
+            // Days of the month
+            $daysOfMonth = date('t',$monthFirstDay);
+
+            $daysPerMonth[$month] = $daysOfMonth;
+
+        }
+
+        // Prepare calendar data
+        $calendarData = [];
+        foreach ($daysPerMonth as $month => $days)
+        {
+            for ($i=1; $i<=$days; $i++) {
+                $calendarData[$year][$month][$i] = null;
+
+            }
+        }
+
+        // Add calendar events to calendar array
+        foreach ($events as $event) {
+            $eventYear = date('Y',strtotime($event->start->dateTime));
+            $eventMonth = date('F',strtotime($event->start->dateTime));
+            $eventDay = intval(date('d',strtotime($event->start->dateTime)));
+
+            $colorArray = config('calendar.colors');
+
+            $color = isset($colorArray[$event->colorId]) ? $colorArray[$event->colorId] : null;
+
+            $calendarData[$eventYear][$eventMonth][$eventDay] = [
+                'color' => $color,
+                'summary' => $event->summary,
+            ];
+        }
+
+        return $calendarData;
 
     }
-
-
-
-
 
 }

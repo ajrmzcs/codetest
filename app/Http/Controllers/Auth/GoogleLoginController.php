@@ -40,29 +40,7 @@ class GoogleLoginController extends Controller
 
         $calendarEvents = (new CustomGoogleCalendar())->getCalendarEvents($google_client_token, $user->email);
 
-        dd($calendarEvents);
-
-        $dateArray = getdate();
-
-        $year = $dateArray['year'];
-
-        $months = config('calendar.months');
-
-        $calendarData = [];
-
-        foreach ($months as $key => $month) {
-
-            // Date for first day of month
-            $monthFirstDay = mktime(0,0,0,$key,1,$year);
-
-            // Days of the month
-            $daysOfMonth = date('t',$monthFirstDay);
-
-            $calendarData[$month] = $daysOfMonth;
-
-        }
-
-        dd($calendarData);
+        return view('calendar', compact('calendarEvents'));
 
     }
 }
